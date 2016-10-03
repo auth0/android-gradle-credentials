@@ -13,21 +13,21 @@ dependencies {
 }
 
 //noinspection GroovyUnusedAssignment
-archivesBaseName = 'buildconstants'
-group = 'com.jenzz'
-version = rootProject.pluginVersion
+archivesBaseName = 'gradle-credentials'
+group = 'com.auth0.android'
+version = '1.0.0'
 
 pluginBundle {
-  website = 'https://github.com/jenzz/gradle-android-buildconstants-plugin'
-  vcsUrl = 'https://github.com/jenzz/gradle-android-buildconstants-plugin'
-  description = 'A Gradle plugin for Android which generates XML constants as part of the build process.'
-  tags = ['java', 'groovy', 'gradle', 'buildconstants', 'buildconfig', 'constants', 'generated']
+  website = 'https://github.com/lbalmaceda/gradle-auth0credentials'
+  vcsUrl = 'https://github.com/lbalmaceda/gradle-auth0credentials'
+  description = 'A Gradle plugin for Android which generates an XML file with the Auth0 Credentials as part of the build process.'
+  tags = ['auth0', 'java', 'groovy', 'gradle', 'buildconstants', 'buildconfig', 'constants', 'generated']
 
   //noinspection GroovyAssignabilityCheck
   plugins {
     buildConstantsPlugin {
-      id = 'com.jenzz.buildconstants'
-      displayName = 'Android build constants generator'
+      id = 'com.auth0.android:gradle-credentials'
+      displayName = 'Auth0 Credentials generator for Android'
     }
   }
 }
