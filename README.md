@@ -1,128 +1,120 @@
-Android Build Constants Plugin [![Build Status](https://travis-ci.org/jenzz/gradle-android-buildconstants-plugin.svg?branch=master)](https://travis-ci.org/jenzz/gradle-android-buildconstants-plugin)
-==============================
-A Gradle plugin for Android which generates both Java and XML constants as part of the build process.
+# Auth0 Android Gradle-Credentials Plugin
 
-Why do I need this?
-===================
-In short: To define constants that are accessible from everywhere in your Android app.
+This plugin generates an XML file with the required Auth0 credentials. It creates a new a Task `generate{buildVariant}Auth0Credentials` to generate the String resources in each build folder. This task attaches automatically to the Build process, and can handle incremental builds.
 
-In long: There are two ways to define constants in Android. Both have their limitations.
-* Creating constants using `buildConfigField` only adds entries to `BuildConfig.java` which means you cannot access them via XML.
-* Creating a custom `constants.xml` resource file with entries like `<string name="constant">constant_value</string>`
-lets you easily reference the constant via `@string/constant` in XML, but requires you to have a `Context` object on the Java side
-to get the value using `getResources().getString(R.string.constant)`.
+## Compile
 
-None of the above solutions is ideal. This plugin lets you specify constants in your `build.gradle` file
-that will be translated into both a Java and an XML-based version with the same constant value.
+1. Clone or download this project.
+2. Run `./gradlew clean build install` so the plugin installs in the **mavenLocal()** repository.
 
-How does it work?
-=================
-The plugin creates a new task per build type, e.g. *generateDebugBuildConstants*.
-It hooks into the build process ahead of the *processDebugResources* task so it will be executed every time you assemble your project.
-It supports incremental builds, i.e. if none of the inputs or outputs have changed, Gradle can skip the task (up-to-date).
+## Setup
 
-Usage
------
-The plugin currently supports **Integer**, **Boolean** and **String** data types.
-
-You can specify the constants using a closure in your `build.gradle` file like this:
-
-```groovy
-buildConstants {
-  constants {
-    aBoolean = true
-    aString = 'string'
-    aNumber = 123
-  }
-}
-```
-
-The plugin will then generate both a Java and an XML version of the constants like so:
-
-**Java:**
-```java
-public final class BuildConstants {
-  
-  public static final boolean ABOOLEAN = true;
-  public static final String ASTRING = "string";
-  public static final int ANUMBER = 123;
-  
-  private BuildConstants() {
-    throw new AssertionError("No instances.");
-  }
-}
-```
-
-**XML:**
-```xml
-<resources>
-	<bool name="aboolean">true</bool>
-	<string name="astring">string</string>
-	<integer name="anumber">123</integer>
-</resources>
-```
-
-Alternatively, you can define the constants using a map:
-
-```groovy
-buildConstants {
-  constants = [
-    aBoolean : true,
-    aString : 'string',
-    aNumber : 123
-  ]
-}
-```
-
-Or specify just a single constant (similar to `buildConfigField`):
-
-```groovy
-buildConstants {
-  constant 'single_constant', 'single_string'
-}
-```
-
-The default generated file names are `BuildConstants.java` and `build_constants.xml`.
-You can change them like this:
-
-```groovy
-buildConstants {
-  javaFileName 'SampleBuildConstants'
-  xmlFileName 'sample_build_constants'
-}
-```
-
-Example
--------
-Check out the [sample project](https://github.com/jenzz/gradle-android-buildconstants-plugin/tree/master/sample) for an example implementation.
-
-Download
---------
-Build script snippet for use in all Gradle versions:
+First you need to add the plugin dependency. Go to your project's `build.gradle` file and add:
 
 ```groovy
 buildscript {
-  repositories {
-    maven {
-      url 'https://plugins.gradle.org/m2/'
+    repositories {
+        mavenLocal()
+        //...
     }
-  }
-  dependencies {
-    classpath 'gradle.plugin.com.jenzz:buildconstants:1.1.0'
-  }
+    dependencies {
+        classpath 'com.auth0.android:gradle-credentials:1.0.0'
+        //...
+    }
 }
-
-apply plugin: 'com.jenzz.buildconstants'
 ```
 
-Build script snippet for new, incubating, plugin mechanism introduced in Gradle 2.1:
+Go to your application's `build.gradle` file and apply the **gradle-credentials** plugin after the **android.application** plugin.
 
 ```groovy
-plugins {
-  id 'com.jenzz.buildconstants' version '1.1.0'
+apply plugin: 'com.android.application'
+apply plugin: 'com.auth0.android.gradle-credentials'
+
+// ...
+```
+
+Next, the plugin will try to find the **Auth0 Credentials** in one of the following locations and respecting this order:
+
+1. Application's Module `build.gradle` file.
+2. Project's `local.properties` file. **(RECOMMENDED)**
+
+The advantage of using the `local.properties` file over the `build.gradle` approach is that as this file shouldn't be pushed to your repository, the credentials will remain private.
+
+> If by any reason you add the `auth0` closure to your `build.gradle` file, it will ignore the values configured in the `local.properties` file.
+
+
+
+### A) Credentials from the `build.gradle` file
+
+In your application's `build.gradle` file, add the `auth0` closure with the `clientId` and `domain` key/values.
+
+```groovy
+// Plugins are applied here
+
+android {
+    // ...
+}
+
+dependencies {
+    // ...
+}
+
+// ...
+
+auth0 {
+    clientId='Owu62gnGsRYhk1v9SfB3c6IUbIJcRIze'   //Auth0 Client ID
+    domain='domain.auth0.com'                     //Auth0 Domain
 }
 ```
+
+### B) Credentials from the `local.properties` file
+
+In your project's `local.properties` file, add the following `auth0` key/values:
+
+```groovy
+sdk.dir=/usr/local/opt/android-sdk
+
+// ...
+
+auth0.clientId=Owu62gnGsRYhk1v9SfB3c6IUbIJcRIze     //Auth0 Client ID
+auth0.domain=lbalmaceda.auth0.com                   //Auth0 Domain
+```
+
+> If the `local.properties` file doesn't exist, try to **sync** or **build** your project and the Android Studio IDE will generate it for you.
+ 
+
+## Access the Credentials
+After you **build** your project or [manually run](#run-the-plugin) the Auth0Credentials task, the credentials will be available in the Android Resources. Access them with the `R` constant:
+
+```
+`String clientId = getResources().getString(R.string.com_auth0_client_id);`
+`String domain = getResources().getString(R.string.com_auth0_domain);`
+```
+
+> If the credentials couldn't be generated, because they weren't specified either in the `local.properties` file or in the `build.gradle` file, they will default to the `{CLIENT_ID}` and `{DOMAIN}` placeholders.
+
+
+## Run the Plugin
+The plugin runs automatically with each project **build**. If you want, you can manually run the task by calling `./gradlew generate{buildVariant}Auth0Credentials` with your preferred buildVariant.
+
+```groovy
+~/MyAndroidProject ❯❯❯ ./gradlew generateDebugAuth0Credentials
+
+Parallel execution is an incubating feature.
+Incremental java compilation is an incubating feature.
+Auth0Credentials: Searching in build.gradle:auth0 closure
+Auth0Credentials: Using ClientID=Owu62gnGsRYhk1v9SfB3c6IUbIJcRIze and Domain=lbalmaceda.auth0.com
+:app:generateDebugAuth0Credentials UP-TO-DATE
+
+BUILD SUCCESSFUL
+
+Total time: 2.732 secs
+```
+
+
+The output will be located in the `build/intermediates/res/merged/{VARIANT}/values/auth0.xml`.
+
 
 License
 -------
-This project is licensed under the [MIT License](https://raw.githubusercontent.com/jenzz/gradle-android-buildconstants-plugin/master/LICENSE).
+This project is licensed under the [MIT License](LICENSE).
