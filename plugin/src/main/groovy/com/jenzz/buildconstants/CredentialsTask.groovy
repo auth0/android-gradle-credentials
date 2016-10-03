@@ -10,7 +10,7 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 
-class BuildConstantsTask extends DefaultTask {
+class CredentialsTask extends DefaultTask {
 
   @Input String variantDir
   @Input Map<String, Object> auth0
