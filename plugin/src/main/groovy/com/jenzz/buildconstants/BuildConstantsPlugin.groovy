@@ -24,9 +24,15 @@ class BuildConstantsPlugin implements Plugin<Project> {
         def generateConstantsTask = project.tasks.create([name       : "generate${variantName}Auth0Credentials",
                                                           description: "Generates an auth0.xml resource file with credentials found in the local.properties file",
                                                           type       : BuildConstantsTask], {
-          appId = variant.applicationId
           variantDir = variant.dirName
-          constants = project.buildConstants.constants
+          if (project.buildConstants.constants){
+            println "Using build.gradle constants"
+            //Prefer build.gradle defined constants over the local.properties one
+            constants = project.buildConstants.constants
+          } else {
+            println "Using local.properties file"
+            constants = parseLocalProperties(project.rootDir.absolutePath)
+          }
         })
 
         def processResourcesTask = project.tasks.find {
@@ -38,4 +44,15 @@ class BuildConstantsPlugin implements Plugin<Project> {
       }
     }
   }
+
+
+  static def parseLocalProperties(String filePath){
+    Properties properties = new Properties()
+    properties.load(new File("${filePath}/local.properties").newDataInputStream())
+    Map<String, Object> constants = new HashMap<>()
+    constants.put("client_id", properties.getProperty("auth0.client_id", "{CLIENT_ID}"))
+    constants.put("domain", properties.getProperty("auth0.domain", "{DOMAIN}"))
+    return constants
+  }
+
 }
