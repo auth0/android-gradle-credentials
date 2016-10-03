@@ -1,12 +1,11 @@
 package com.jenzz.buildconstants.categories
 
-import org.junit.Test
+import org.gradle.internal.impldep.org.junit.Test
 
 import static org.assertj.core.api.Assertions.assertThat
 
-class StringCategoryTest {
+class StringCategoryTest extends GroovyTestCase {
 
-  @Test
   void isCapitalized() {
     use(StringCategory) {
       assertThat "Hello".isCapitalized() isTrue()

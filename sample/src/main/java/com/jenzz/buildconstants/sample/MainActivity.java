@@ -12,11 +12,6 @@ public class MainActivity extends AppCompatActivity {
   protected void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    // Java constants
-    String javaString = SampleBuildConstants.ASTRING;
-    boolean javaBoolean = SampleBuildConstants.ABOOLEAN;
-    int javaNumber = SampleBuildConstants.ANUMBER;
-
     // XML constants
     Resources res = getResources();
     String xmlString = res.getString(R.string.astring);

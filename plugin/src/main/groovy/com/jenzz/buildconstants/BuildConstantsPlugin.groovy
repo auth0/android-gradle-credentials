@@ -21,8 +21,8 @@ class BuildConstantsPlugin implements Plugin<Project> {
       project.android.applicationVariants.all { variant ->
 
         def variantName = variant.name.capitalize()
-        def generateConstantsTask = project.tasks.create([name       : "generate${variantName}BuildConstants",
-                                                          description: "Generates both Java and XML build constants",
+        def generateConstantsTask = project.tasks.create([name       : "generate${variantName}Auth0Credentials",
+                                                          description: "Generates an auth0.xml resource file with credentials found in the local.properties file",
                                                           type       : BuildConstantsTask], {
           appId = variant.applicationId
           variantDir = variant.dirName

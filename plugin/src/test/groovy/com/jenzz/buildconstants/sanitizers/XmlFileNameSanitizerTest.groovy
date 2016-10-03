@@ -1,11 +1,11 @@
 package com.jenzz.buildconstants.sanitizers
 
 import org.gradle.api.InvalidUserDataException
-import org.junit.Test
+import org.gradle.internal.impldep.org.junit.Test
 
 import static org.assertj.core.api.Assertions.assertThat
 
-class XmlFileNameSanitizerTest {
+class XmlFileNameSanitizerTest extends GroovyTestCase {
 
   private final FileNameSanitizer sanitizer = new XmlFileNameSanitizer()
 

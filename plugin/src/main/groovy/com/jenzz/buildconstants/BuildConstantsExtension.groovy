@@ -7,8 +7,7 @@ import static groovy.lang.Closure.DELEGATE_FIRST
 @SuppressWarnings("GroovyUnusedDeclaration")
 public class BuildConstantsExtension {
 
-  String javaFileName = "BuildConstants"
-  String xmlFileName = "build_constants"
+  String xmlFileName = "auth0"
 
   Map<String, Object> constants = new LinkedHashMap<>()
 

@@ -1,10 +1,8 @@
 package com.jenzz.buildconstants.factories
 
-import org.junit.Test
+import org.gradle.internal.impldep.org.testng.annotations.Test
 
-import static org.assertj.core.api.Assertions.assertThat
-
-class XmlFileFactoryTest {
+class XmlFileFactoryTest extends GroovyTestCase {
 
   @Test
   void createsCorrectPath() {
