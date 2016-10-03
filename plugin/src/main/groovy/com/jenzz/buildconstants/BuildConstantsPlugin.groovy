@@ -7,32 +7,39 @@ import org.gradle.api.Project
 
 class BuildConstantsPlugin implements Plugin<Project> {
 
+  static final String CLIENT_ID_KEY = "com_auth0_client_id"
+  static final String DOMAIN_KEY = "com_auth0_domain"
+  static final String DOMAIN_DEFAULT_VALUE = "{DOMAIN}"
+  static final String CLIENT_ID_DEFAULT_VALUE = "{CLIENT_ID}"
+
   @Override
   void apply(Project project) {
     if (!project.plugins.findPlugin(AppPlugin)) {
       throw new GradleException(
-          'You must apply the Android plugin before using the \'com.jenzz.buildconstants\' plugin')
+          'You must apply the Android Application plugin before using the \'com.jenzz.buildconstants\' plugin')
     }
 
-    project.extensions.add 'buildConstants', BuildConstantsExtension
+    project.extensions.add 'auth0', Auth0CredentialsExtension
 
     project.afterEvaluate {
 
       project.android.applicationVariants.all { variant ->
 
         def variantName = variant.name.capitalize()
-        def generateConstantsTask = project.tasks.create([name       : "generate${variantName}Auth0Credentials",
-                                                          description: "Generates an auth0.xml resource file with credentials found in the local.properties file",
-                                                          type       : BuildConstantsTask], {
+        def generateCredentialsTask = project.tasks.create(
+                [name       : "generate${variantName}Auth0Credentials",
+                description: "Generates an auth0.xml resource file with credentials found in the local.properties file",
+                type       : BuildConstantsTask], {
           variantDir = variant.dirName
-          if (project.buildConstants.constants){
-            println "Using build.gradle constants"
-            //Prefer build.gradle defined constants over the local.properties one
-            constants = project.buildConstants.constants
+          if (project.auth0){
+            println "Auth0Credentials: Searching in build.gradle:auth0 closure"
+            auth0 = parseCredentials(project.auth0)
           } else {
-            println "Using local.properties file"
-            constants = parseLocalProperties(project.rootDir.absolutePath)
+            println "Auth0Credentials: Searching in local.properties file"
+            auth0 = parseLocalProperties(project.rootDir.absolutePath)
           }
+
+          println "Auth0Credentials: Using ClientID=${auth0.get(CLIENT_ID_KEY)} and Domain=${auth0.get(DOMAIN_KEY)}"
         })
 
         def processResourcesTask = project.tasks.find {
@@ -40,19 +47,25 @@ class BuildConstantsPlugin implements Plugin<Project> {
           pattern.matcher(it.name).matches()
         }
 
-        processResourcesTask.dependsOn generateConstantsTask
+        processResourcesTask.dependsOn generateCredentialsTask
       }
     }
   }
 
+  static def parseCredentials(Auth0CredentialsExtension map){
+    Map<String, Object> auth0 = new HashMap<>()
+    auth0.put(CLIENT_ID_KEY, map.getClientId())
+    auth0.put(DOMAIN_KEY, map.getDomain())
+    return auth0
+  }
 
   static def parseLocalProperties(String filePath){
     Properties properties = new Properties()
     properties.load(new File("${filePath}/local.properties").newDataInputStream())
-    Map<String, Object> constants = new HashMap<>()
-    constants.put("client_id", properties.getProperty("auth0.client_id", "{CLIENT_ID}"))
-    constants.put("domain", properties.getProperty("auth0.domain", "{DOMAIN}"))
-    return constants
+    Map<String, Object> auth0 = new HashMap<>()
+    auth0.put(CLIENT_ID_KEY, properties.getProperty("auth0.client_id", CLIENT_ID_DEFAULT_VALUE))
+    auth0.put(DOMAIN_KEY, properties.getProperty("auth0.domain", DOMAIN_DEFAULT_VALUE))
+    return auth0
   }
 
 }

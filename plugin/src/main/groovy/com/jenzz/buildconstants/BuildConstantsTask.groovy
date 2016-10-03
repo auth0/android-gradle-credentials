@@ -13,7 +13,7 @@ import org.gradle.api.tasks.TaskAction
 class BuildConstantsTask extends DefaultTask {
 
   @Input String variantDir
-  @Input Map<String, Object> constants
+  @Input Map<String, Object> auth0
 
   @OutputFile File xmlFile
 
@@ -32,12 +32,12 @@ class BuildConstantsTask extends DefaultTask {
 
   @NonNull
   private File createXmlFile() {
-    String fileNameInput = project.buildConstants.xmlFileName
+    String fileNameInput = "auth0"
     String fileName = new XmlFileNameSanitizer().sanitize fileNameInput
     new XmlFileFactory(project.buildDir.path, variantDir).create fileName
   }
 
   private void brewXml() {
-    new XmlConstantsWriter(xmlFile).write constants
+    new XmlConstantsWriter(xmlFile).write auth0
   }
 }
