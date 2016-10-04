@@ -25,9 +25,14 @@
 package com.auth0.android.gradle.credentials
 
 import com.android.build.gradle.AppPlugin
+import com.auth0.android.gradle.credentials.extensions.CredentialsExtension
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+
+import static Utils.isValidString
+import static Utils.mapContainsParent
+import static com.auth0.android.gradle.credentials.Utils.nullSafeMap
 
 class CredentialsPlugin implements Plugin<Project> {
 
@@ -35,6 +40,7 @@ class CredentialsPlugin implements Plugin<Project> {
     private static final String RES_DOMAIN_KEY = "com_auth0_domain"
     private static final String LOCAL_PROPERTIES_CLIENT_ID_KEY = "auth0.clientId"
     private static final String LOCAL_PROPERTIES_DOMAIN_KEY = "auth0.domain"
+    private static final String LOCAL_PROPERTIES_GUARDIAN_PARENT_KEY = "auth0.guardian"
 
     @Override
     void apply(Project project) {
@@ -55,11 +61,6 @@ class CredentialsPlugin implements Plugin<Project> {
                          description: "Generates an auth0.xml resource file with credentials found in the build.gradle:auth0 closure or the local.properties file",
                          type       : CredentialsTask], {
                     variantDir = variant.dirName
-                    if (!project.auth0) {
-                        println "Auth0 extension doesn't exists in the build.gradle file. Creating a default one.."
-                        project.auth0 = new CredentialsExtension();
-                    }
-
                     def homeLocalPropertiesPath = System.getProperty("user.home")
                     def projectLocalPropertiesPath = project.rootDir.absolutePath
 
@@ -71,6 +72,7 @@ class CredentialsPlugin implements Plugin<Project> {
                         throw new GradleException("Auth0 Credentials not found! Make sure to define both the 'clientId' and the 'domain' values. I've searched for them in this order: 1) 'local.properties' file located in the User's Home directory. " +
                                 "2) 'local.properties' file located in the Project's directory. 3) 'build.gradle' file located in the Application's directory.")
                     }
+                    auth0 = nullSafeMap(auth0)
 
                     println "Auth0Credentials: Using ClientID=${auth0.get(RES_CLIENT_ID_KEY)} and Domain=${auth0.get(RES_DOMAIN_KEY)}"
                 })
@@ -90,14 +92,7 @@ class CredentialsPlugin implements Plugin<Project> {
     }
 
     static def hasCredentials(Map auth0) {
-        return auth0 != null && isValidString(auth0.get(RES_CLIENT_ID_KEY)) && isValidString(auth0.get(RES_DOMAIN_KEY))
-    }
-
-    static def isValidString(String value) {
-        if (value == null || value.trim().isEmpty()) {
-            return false
-        }
-        return true
+        return auth0 != null && isValidString(auth0.get(RES_DOMAIN_KEY)) && isValidString(auth0.get(RES_CLIENT_ID_KEY))
     }
 
     static def parseLocalProperties(String filePath) {
@@ -108,16 +103,16 @@ class CredentialsPlugin implements Plugin<Project> {
         Properties properties = new Properties()
         properties.load(file.newDataInputStream())
         Map<String, Object> auth0 = new HashMap<>()
-        auth0.put(RES_CLIENT_ID_KEY, properties.getProperty(LOCAL_PROPERTIES_CLIENT_ID_KEY))
         auth0.put(RES_DOMAIN_KEY, properties.getProperty(LOCAL_PROPERTIES_DOMAIN_KEY))
+        auth0.put(RES_CLIENT_ID_KEY, properties.getProperty(LOCAL_PROPERTIES_CLIENT_ID_KEY))
+        if (mapContainsParent(properties, LOCAL_PROPERTIES_GUARDIAN_PARENT_KEY)) {
+            //TODO: Read guardian stuff
+        }
         return auth0
     }
 
     static def parseCredentials(CredentialsExtension ext) {
-        Map<String, Object> auth0 = new HashMap<>()
-        auth0.put(RES_CLIENT_ID_KEY, ext.getClientId())
-        auth0.put(RES_DOMAIN_KEY, ext.getDomain())
-        return auth0
+        return ext.hasRequiredProperties() ? ext.getValues() : null
     }
 
 }

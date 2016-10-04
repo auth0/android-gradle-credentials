@@ -22,11 +22,43 @@
  * THE SOFTWARE.
  */
 
-package com.auth0.android.gradle.credentials
+package com.auth0.android.gradle.credentials.extensions
+
+import com.android.annotations.NonNull
+import org.gradle.api.plugins.ExtensionAware
+
+import static com.auth0.android.gradle.credentials.Utils.isValidString
 
 @SuppressWarnings("GroovyUnusedDeclaration")
-public class CredentialsExtension {
+public class CredentialsExtension implements ExtensionValidator {
+
+    private static final String RES_CLIENT_ID_KEY = "com_auth0_client_id"
+    private static final String RES_DOMAIN_KEY = "com_auth0_domain"
 
     String domain
     String clientId
+
+    //Extensions
+    GuardianExtension guardian
+
+    public CredentialsExtension() {
+        guardian = ((ExtensionAware) this).getExtensions().create("guardian", GuardianExtension.class)
+    }
+
+    @Override
+    boolean hasRequiredProperties() {
+        return isValidString(domain) && isValidString(clientId)
+    }
+
+    @Override
+    @NonNull
+    Map getValues() {
+        Map values = new HashMap<>()
+        values.put(RES_DOMAIN_KEY, domain)
+        values.put(RES_CLIENT_ID_KEY, clientId)
+
+        //Extensions
+        values.putAll(guardian.getValues())
+        return values
+    }
 }

@@ -39,7 +39,7 @@ Next, the plugin will try to find the **Auth0 Credentials** in one of the follow
 2. Project's `local.properties` file. This location is also **RECOMMENDED** as this file shouldn't be committed/pushed to the repository, the credentials will always remain private.
 3. The Application's Module `build.gradle` file.
 
-** If one or all of the keys are missing, the plugin will try to search for them in the next location. If they can't be found in the last location, it will throw an exception and won't let you build the project. **
+** If either the `domain` or the `clientId` key/values are missing, the plugin will try to search for them in the next location. If they can't be found in the last location, it will throw an exception and won't let you build the project. **
 
 ### Credentials in a local.properties file
 
@@ -48,8 +48,9 @@ Find the `local.properties` file in your User's Home directory or in your Projec
 ```groovy
 // ...
 
-auth0.clientId=1Wu12gnhRRYh31v9SfB3c6I3bIJdRIze     //Auth0 Client ID
 auth0.domain=lbalmaceda.auth0.com                   //Auth0 Domain
+auth0.clientId=1Wu12gnhRRYh31v9SfB3c6I3bIJdRIze     //Auth0.Lock Client ID
+auth0.guardian.domain=guardian-domain               //Auth0.Guardian Domain
 ```
 
 > If the `local.properties` file doesn't exist in your Project's Home directory, try to **sync** or **build** your project and the Android Studio IDE will generate it for you. If you want to use your User's Home directory, you will need to create it manually.
@@ -57,7 +58,7 @@ auth0.domain=lbalmaceda.auth0.com                   //Auth0 Domain
 
 ### Credentials in a build.gradle file 
 
-Find your Application's `build.gradle` file. Next, add the `auth0` closure with the `clientId` and `domain` key/values.
+Find your Application's `build.gradle` file. Next, add the `auth0` closure with `domain` and `lock.clientId` key/values.
 
 ```groovy
 // Plugins are applied here
@@ -73,8 +74,11 @@ dependencies {
 // ...
 
 auth0 {
-    clientId='1Wu12gnhRRYh31v9SfB3c6I3bIJdRIze'   //Auth0 Client ID
-    domain='domain.auth0.com'                     //Auth0 Domain
+    domain 'lbalmaceda.auth0.com'                 //Auth0 Domain
+    clientId '1Wu12gnhRRYh31v9SfB3c6I3bIJdRIze'   //Auth0.Lock Client ID
+    guardian {
+        domain 'guardian-domain'                  //Auth0.Guardian Domain
+    }
 }
 ```
 
@@ -83,8 +87,9 @@ auth0 {
 After you **build** your project or [manually run](#run-the-plugin) the Auth0Credentials task, the credentials will be available in the Android Resources. Access them with the `R` constant:
 
 ```
-`String clientId = getResources().getString(R.string.com_auth0_client_id);`
 `String domain = getResources().getString(R.string.com_auth0_domain);`
+`String clientId = getResources().getString(R.string.com_auth0_client_id);`
+`String guardianDomain = getResources().getString(R.string.com_auth0_guardian_domain);`
 ```
 
 
