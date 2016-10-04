@@ -59,14 +59,17 @@ class CredentialsPlugin implements Plugin<Project> {
                         println "Auth0 extension doesn't exists in the build.gradle file. Creating a default one.."
                         project.auth0 = new CredentialsExtension();
                     }
-                    def localPropertiesPath = project.rootDir.absolutePath
 
-                    if (hasLocalProperties(localPropertiesPath)) {
-                        println "Auth0Credentials: Credentials found in the Project's local.properties file. Overriding build.gradle:auth0 settings.."
-                        auth0 = parseLocalProperties(localPropertiesPath)
-                    } else {
-                        println "Auth0Credentials: Searching in the Application's build.gradle:auth0 closure.."
-                        auth0 = parseCredentials(project.auth0)
+                    def homeLocalPropertiesPath = System.getProperty("user.home")
+                    def projectLocalPropertiesPath = project.rootDir.absolutePath
+
+                    auth0 = parseLocalProperties(homeLocalPropertiesPath)
+                    auth0 = pickFirstValid(auth0, parseLocalProperties(projectLocalPropertiesPath))
+                    auth0 = pickFirstValid(auth0, parseCredentials(project.auth0))
+
+                    if (!hasCredentials(auth0)) {
+                        throw new GradleException("Auth0 Credentials not found! Make sure to define both the 'clientId' and the 'domain' values. I've searched for them in this order: 1) 'local.properties' file located in the User's Home directory. " +
+                                "2) 'local.properties' file located in the Project's directory. 3) 'build.gradle' file located in the Application's directory.")
                     }
 
                     println "Auth0Credentials: Using ClientID=${auth0.get(RES_CLIENT_ID_KEY)} and Domain=${auth0.get(RES_DOMAIN_KEY)}"
@@ -82,50 +85,12 @@ class CredentialsPlugin implements Plugin<Project> {
         }
     }
 
-    static def hasLocalProperties(String filePath) {
-        Properties properties = new Properties()
-        properties.load(new File("${filePath}/local.properties").newDataInputStream())
-        String clientId = properties.getProperty(LOCAL_PROPERTIES_CLIENT_ID_KEY)
-        String domain = properties.getProperty(LOCAL_PROPERTIES_DOMAIN_KEY)
-
-        return isValidString(clientId) || isValidString(domain)
+    static def pickFirstValid(Map a, Map b) {
+        return hasCredentials(a) ? a : b;
     }
 
-    static def parseLocalProperties(String filePath) {
-        Properties properties = new Properties()
-        properties.load(new File("${filePath}/local.properties").newDataInputStream())
-        String clientId = properties.getProperty(LOCAL_PROPERTIES_CLIENT_ID_KEY)
-        String domain = properties.getProperty(LOCAL_PROPERTIES_DOMAIN_KEY)
-
-        Map<String, Object> auth0 = new HashMap<>()
-        if (isValidString(clientId) && !isValidString(domain)) {
-            throw new GradleException('Missing \'' + LOCAL_PROPERTIES_DOMAIN_KEY + '\' value in the Project\'s local.properties file');
-        }
-        if (!isValidString(clientId) && isValidString(domain)) {
-            throw new GradleException('Missing \'' + LOCAL_PROPERTIES_CLIENT_ID_KEY + '\' value in the Project\'s local.properties file');
-        }
-        println "Auth0Credentials: About to parse local.properties file"
-
-
-        auth0.put(RES_CLIENT_ID_KEY, clientId)
-        auth0.put(RES_DOMAIN_KEY, domain)
-        return auth0
-    }
-
-    static def parseCredentials(CredentialsExtension ext) {
-        String clientId = ext.getClientId()
-        String domain = ext.getDomain()
-
-        Map<String, Object> auth0 = new HashMap<>()
-        if (isValidString(clientId) && !isValidString(domain)) {
-            throw new GradleException('Missing \'auth0:domain\' value in the Application\'s build.gradle file');
-        }
-        if (!isValidString(clientId) && isValidString(domain)) {
-            throw new GradleException('Missing \'auth0:clientId\' value in the Application\'s build.gradle file');
-        }
-        auth0.put(RES_CLIENT_ID_KEY, clientId)
-        auth0.put(RES_DOMAIN_KEY, domain)
-        return auth0
+    static def hasCredentials(Map auth0) {
+        return auth0 != null && isValidString(auth0.get(RES_CLIENT_ID_KEY)) && isValidString(auth0.get(RES_DOMAIN_KEY))
     }
 
     static def isValidString(String value) {
@@ -133,6 +98,26 @@ class CredentialsPlugin implements Plugin<Project> {
             return false
         }
         return true
+    }
+
+    static def parseLocalProperties(String filePath) {
+        File file = new File("${filePath}/local.properties");
+        if (!file.exists()) {
+            return null
+        }
+        Properties properties = new Properties()
+        properties.load(file.newDataInputStream())
+        Map<String, Object> auth0 = new HashMap<>()
+        auth0.put(RES_CLIENT_ID_KEY, properties.getProperty(LOCAL_PROPERTIES_CLIENT_ID_KEY))
+        auth0.put(RES_DOMAIN_KEY, properties.getProperty(LOCAL_PROPERTIES_DOMAIN_KEY))
+        return auth0
+    }
+
+    static def parseCredentials(CredentialsExtension ext) {
+        Map<String, Object> auth0 = new HashMap<>()
+        auth0.put(RES_CLIENT_ID_KEY, ext.getClientId())
+        auth0.put(RES_DOMAIN_KEY, ext.getDomain())
+        return auth0
     }
 
 }

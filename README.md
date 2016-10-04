@@ -35,34 +35,29 @@ apply plugin: 'com.auth0.android.gradle-credentials'
 
 Next, the plugin will try to find the **Auth0 Credentials** in one of the following locations in this order:
 
-1. First in the Project's `local.properties` file. This is the **RECOMMENDED** location. If the file doesn't contain the `auth0.clientId` or the `auth0.domain` keys, it will try to search them in the next location.
-2. The Application's Module `build.gradle` file.
+1. User's Home `local.properties` file. This is the **RECOMMENDED** location as you only need to setup once your credentials and it will work for every project. 
+2. Project's `local.properties` file. This location is also **RECOMMENDED** as this file shouldn't be committed/pushed to the repository, the credentials will always remain private.
+3. The Application's Module `build.gradle` file.
 
-The advantage of using the `local.properties` file over the `build.gradle` approach is that as this file shouldn't be commited/pushed to your repository, the credentials will always remain private.
+** If one or all of the keys are missing, the plugin will try to search for them in the next location. If they can't be found in the last location, it will throw an exception and won't let you build the project. **
 
-> If by any reason you add the `auth0` keys in the `local.properties` file, it will ignore the values defined in the `build.gradle` file.
+### Credentials in a local.properties file
 
-** The plugin will throw an exception if the credentials couldn't be found at any location. **
-
-### A) Add the Credentials [RECOMMENDED WAY] 
-
-In your project's `local.properties` file, add the following `auth0` key/values:
+Find the `local.properties` file in your User's Home directory or in your Project's Home directory. Next, add the following `auth0` key/values:
 
 ```groovy
-sdk.dir=/usr/local/opt/android-sdk
-
 // ...
 
 auth0.clientId=1Wu12gnhRRYh31v9SfB3c6I3bIJdRIze     //Auth0 Client ID
 auth0.domain=lbalmaceda.auth0.com                   //Auth0 Domain
 ```
 
-> If the `local.properties` file doesn't exist, try to **sync** or **build** your project and the Android Studio IDE will generate it for you.
- 
+> If the `local.properties` file doesn't exist in your Project's Home directory, try to **sync** or **build** your project and the Android Studio IDE will generate it for you. If you want to use your User's Home directory, you will need to create it manually.
+   
 
-### B) Add the Credentials 
+### Credentials in a build.gradle file 
 
-In your application's `build.gradle` file, add the `auth0` closure with the `clientId` and `domain` key/values.
+Find your Application's `build.gradle` file. Next, add the `auth0` closure with the `clientId` and `domain` key/values.
 
 ```groovy
 // Plugins are applied here
