@@ -33,18 +33,33 @@ apply plugin: 'com.auth0.android.gradle-credentials'
 // ...
 ```
 
-Next, the plugin will try to find the **Auth0 Credentials** in one of the following locations and respecting this order:
+Next, the plugin will try to find the **Auth0 Credentials** in one of the following locations in this order:
 
-1. Application's Module `build.gradle` file.
-2. Project's `local.properties` file. **(RECOMMENDED)**
+1. First in the Project's `local.properties` file. This is the **RECOMMENDED** location. If the file doesn't contain the `auth0.clientId` or the `auth0.domain` keys, it will try to search them in the next location.
+2. The Application's Module `build.gradle` file. If the file doesn't contain the `auth0:clientId` or the `auth0:domain` keys, it will default them to `{CLIENT_ID}` and `{DOMAIN}` placeholders.
 
-The advantage of using the `local.properties` file over the `build.gradle` approach is that as this file shouldn't be pushed to your repository, the credentials will remain private.
+The advantage of using the `local.properties` file over the `build.gradle` approach is that as this file shouldn't be commited/pushed to your repository, the credentials will always remain private.
 
-> If by any reason you add the `auth0` closure to your `build.gradle` file, it will ignore the values configured in the `local.properties` file.
+> If by any reason you add the `auth0` keys in the `local.properties` file, it will ignore the values defined in the `build.gradle` file.
 
 
+### A) Add the Credentials [RECOMMENDED WAY] 
 
-### A) Credentials from the `build.gradle` file
+In your project's `local.properties` file, add the following `auth0` key/values:
+
+```groovy
+sdk.dir=/usr/local/opt/android-sdk
+
+// ...
+
+auth0.clientId=1Wu12gnhRRYh31v9SfB3c6I3bIJdRIze     //Auth0 Client ID
+auth0.domain=lbalmaceda.auth0.com                   //Auth0 Domain
+```
+
+> If the `local.properties` file doesn't exist, try to **sync** or **build** your project and the Android Studio IDE will generate it for you.
+ 
+
+### B) Add the Credentials 
 
 In your application's `build.gradle` file, add the `auth0` closure with the `clientId` and `domain` key/values.
 
@@ -62,26 +77,11 @@ dependencies {
 // ...
 
 auth0 {
-    clientId='Owu62gnGsRYhk1v9SfB3c6IUbIJcRIze'   //Auth0 Client ID
+    clientId='1Wu12gnhRRYh31v9SfB3c6I3bIJdRIze'   //Auth0 Client ID
     domain='domain.auth0.com'                     //Auth0 Domain
 }
 ```
 
-### B) Credentials from the `local.properties` file
-
-In your project's `local.properties` file, add the following `auth0` key/values:
-
-```groovy
-sdk.dir=/usr/local/opt/android-sdk
-
-// ...
-
-auth0.clientId=Owu62gnGsRYhk1v9SfB3c6IUbIJcRIze     //Auth0 Client ID
-auth0.domain=lbalmaceda.auth0.com                   //Auth0 Domain
-```
-
-> If the `local.properties` file doesn't exist, try to **sync** or **build** your project and the Android Studio IDE will generate it for you.
- 
 
 ## Access the Credentials
 After you **build** your project or [manually run](#run-the-plugin) the Auth0Credentials task, the credentials will be available in the Android Resources. Access them with the `R` constant:
@@ -103,7 +103,7 @@ The plugin runs automatically with each project **build**. If you want, you can 
 Parallel execution is an incubating feature.
 Incremental java compilation is an incubating feature.
 Auth0Credentials: Searching in build.gradle:auth0 closure
-Auth0Credentials: Using ClientID=Owu62gnGsRYhk1v9SfB3c6IUbIJcRIze and Domain=lbalmaceda.auth0.com
+Auth0Credentials: Using ClientID=1Wu12gnhRRYh31v9SfB3c6I3bIJdRIze and Domain=lbalmaceda.auth0.com
 :app:generateDebugAuth0Credentials UP-TO-DATE
 
 BUILD SUCCESSFUL

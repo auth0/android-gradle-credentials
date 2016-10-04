@@ -31,12 +31,17 @@ class CredentialsPlugin implements Plugin<Project> {
                          description: "Generates an auth0.xml resource file with credentials found in the build.gradle:auth0 closure or the local.properties file",
                          type       : CredentialsTask], {
                     variantDir = variant.dirName
-                    if (project.auth0) {
-                        println "Auth0Credentials: Searching in build.gradle:auth0 closure"
-                        auth0 = parseCredentials(project.auth0)
+                    if (!project.auth0){
+                        project.auth0 = new CredentialsExtension();
+                    }
+                    def localPropertiesPath = project.rootDir.absolutePath
+
+                    if (hasLocalProperties(localPropertiesPath)) {
+                        println "Auth0Credentials: Credentials found in local.properties file. Overriding build.gradle:auth0 settings.."
+                        auth0 = parseLocalProperties(localPropertiesPath)
                     } else {
-                        println "Auth0Credentials: Searching in local.properties file"
-                        auth0 = parseLocalProperties(project.rootDir.absolutePath)
+                        println "Auth0Credentials: Searching in build.gradle:auth0 closure.."
+                        auth0 = parseCredentials(project.auth0)
                     }
 
                     println "Auth0Credentials: Using ClientID=${auth0.get(CLIENT_ID_KEY)} and Domain=${auth0.get(DOMAIN_KEY)}"
@@ -50,6 +55,12 @@ class CredentialsPlugin implements Plugin<Project> {
                 processResourcesTask.dependsOn generateCredentialsTask
             }
         }
+    }
+
+    static def hasLocalProperties(String filePath) {
+        Properties properties = new Properties()
+        properties.load(new File("${filePath}/local.properties").newDataInputStream())
+        return properties.hasProperty(CLIENT_ID_KEY) || properties.hasProperty(DOMAIN_KEY);
     }
 
     static def parseCredentials(CredentialsExtension ext) {
