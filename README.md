@@ -36,12 +36,13 @@ apply plugin: 'com.auth0.android.gradle-credentials'
 Next, the plugin will try to find the **Auth0 Credentials** in one of the following locations in this order:
 
 1. First in the Project's `local.properties` file. This is the **RECOMMENDED** location. If the file doesn't contain the `auth0.clientId` or the `auth0.domain` keys, it will try to search them in the next location.
-2. The Application's Module `build.gradle` file. If the file doesn't contain the `auth0:clientId` or the `auth0:domain` keys, it will default them to `{CLIENT_ID}` and `{DOMAIN}` placeholders.
+2. The Application's Module `build.gradle` file.
 
 The advantage of using the `local.properties` file over the `build.gradle` approach is that as this file shouldn't be commited/pushed to your repository, the credentials will always remain private.
 
 > If by any reason you add the `auth0` keys in the `local.properties` file, it will ignore the values defined in the `build.gradle` file.
 
+** The plugin will throw an exception if the credentials couldn't be found at any location. **
 
 ### A) Add the Credentials [RECOMMENDED WAY] 
 
@@ -90,8 +91,6 @@ After you **build** your project or [manually run](#run-the-plugin) the Auth0Cre
 `String clientId = getResources().getString(R.string.com_auth0_client_id);`
 `String domain = getResources().getString(R.string.com_auth0_domain);`
 ```
-
-> If the credentials couldn't be generated, because they weren't specified either in the `local.properties` file or in the `build.gradle` file, they will default to the `{CLIENT_ID}` and `{DOMAIN}` placeholders.
 
 
 ## Run the Plugin
