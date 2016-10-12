@@ -1,15 +1,46 @@
 # Auth0 Android Gradle-Credentials Plugin
 
+[![Release](https://jitpack.io/v/auth0/android-gradle-credentials.svg)](https://jitpack.io/#auth0/android-gradle-credentials/master-SNAPSHOT)
+
 This plugin generates an XML file with the required Auth0 credentials. It creates a new a Task `generate{buildVariant}Auth0Credentials` to generate the String resources in each build folder. This task attaches automatically to the Build process, and can handle incremental builds.
 
-## Compile
+## Setup
+
+### Using JitPack
+
+This is the **RECOMMENDED** approach. Add JitPack to the buildscript/repositories list and also add the plugin to the buildscript/classpath inside the project's `build.gradle` file:
+
+```groovy
+buildscript {
+    repositories {
+        jcenter()
+        //...
+        maven { url "https://jitpack.io" }
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.2.1'
+        //...
+        classpath 'com.github.auth0:android-gradle-credentials:master-SNAPSHOT'
+    }
+}
+```
+
+Go to your application's `build.gradle` file and apply the **gradle-credentials** plugin after the **android.application** plugin.
+
+```groovy
+apply plugin: 'com.android.application'
+apply plugin: 'com.auth0.android.gradle-credentials'
+
+// ...
+```
+
+
+### Using a fresh local build
 
 1. Clone or download this project.
 2. Run `./gradlew clean build install` so the plugin installs in the **mavenLocal()** repository.
 
-## Setup
-
-First you need to add the plugin dependency. Go to your project's `build.gradle` file and add:
+Add the plugin dependency. Go to your project's `build.gradle` file and add:
 
 ```groovy
 buildscript {
@@ -33,7 +64,9 @@ apply plugin: 'com.auth0.android.gradle-credentials'
 // ...
 ```
 
-Next, the plugin will try to find the **Auth0 Credentials** in one of the following locations in this order:
+## How it Works
+
+The plugin will try to find the **Auth0 Credentials** in one of the following locations in this order:
 
 1. User's Home `local.properties` file. This is the **RECOMMENDED** location as you only need to setup once your credentials and it will work for every project. 
 2. Project's `local.properties` file. This location is also **RECOMMENDED** as this file shouldn't be committed/pushed to the repository, the credentials will always remain private.
