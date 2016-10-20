@@ -26,7 +26,7 @@ pluginBundle {
   //noinspection GroovyAssignabilityCheck
   plugins {
     buildConstantsPlugin {
-      id = 'com.auth0.android:gradle-credentials'
+      id = 'com.auth0.android.gradle-credentials'
       displayName = 'Auth0 Credentials generator for Android'
     }
   }
