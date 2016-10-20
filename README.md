@@ -1,14 +1,42 @@
 # Auth0 Android Gradle-Credentials Plugin
 
-[![Release](https://jitpack.io/v/auth0/android-gradle-credentials.svg)](https://jitpack.io/#auth0/android-gradle-credentials/master-SNAPSHOT)
+[![JitPack](https://jitpack.io/v/auth0/android-gradle-credentials.svg)](https://jitpack.io/#auth0/android-gradle-credentials/master-SNAPSHOT) [![Gradle](https://img.shields.io/badge/gradle--plugin-latest-orange.svg)](https://plugins.gradle.org/plugin/com.auth0.android.gradle-credentials) [![GitHub tag](https://img.shields.io/github/tag/auth0/android-gradle-credentials.svg)](https://github.com/auth0/android-gradle-credentials/releases) [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](http://choosealicense.com/licenses/mit/)
 
 This plugin generates an XML file with the required Auth0 credentials. It creates a new a Task `generate{buildVariant}Auth0Credentials` to generate the String resources in each build folder. This task attaches automatically to the Build process, and can handle incremental builds.
 
 ## Setup
 
+### Using Gradle
+This is the **RECOMMENDED** approach. Add the Gradle's Maven url to the buildscript/repositories list and also add the plugin to the buildscript/classpath inside the project's `build.gradle` file:g
+
+```groovy
+buildscript {
+    repositories {
+        jcenter()
+        //...
+        maven { url "https://plugins.gradle.org/m2/" }
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.2.1'
+        //...
+        classpath 'gradle.plugin.com.auth0.android:gradle-credentials:1.0.0'
+    }
+}
+```
+
+Go to your application's `build.gradle` file and apply the **gradle-credentials** plugin after the **android.application** plugin.
+
+```groovy
+apply plugin: 'com.android.application'
+apply plugin: 'com.auth0.android.gradle-credentials'
+
+// ...
+```
+
+
 ### Using JitPack
 
-This is the **RECOMMENDED** approach. Add JitPack to the buildscript/repositories list and also add the plugin to the buildscript/classpath inside the project's `build.gradle` file:
+Add JitPack to the buildscript/repositories list and also add the plugin to the buildscript/classpath inside the project's `build.gradle` file:
 
 ```groovy
 buildscript {
@@ -68,7 +96,7 @@ apply plugin: 'com.auth0.android.gradle-credentials'
 
 The plugin will try to find the **Auth0 Credentials** in one of the following locations in this order:
 
-1. User's Home `local.properties` file. This is the **RECOMMENDED** location as you only need to setup once your credentials and it will work for every project. 
+1. User's Home `local.properties` file. This is the **RECOMMENDED** location as you only need to setup once your credentials and it will work for every project.
 2. Project's `local.properties` file. This location is also **RECOMMENDED** as this file shouldn't be committed/pushed to the repository, the credentials will always remain private.
 3. The Application's Module `build.gradle` file.
 
@@ -87,9 +115,9 @@ auth0.guardian.domain=guardian-domain               //Auth0.Guardian Domain
 ```
 
 > If the `local.properties` file doesn't exist in your Project's Home directory, try to **sync** or **build** your project and the Android Studio IDE will generate it for you. If you want to use your User's Home directory, you will need to create it manually.
-   
 
-### Credentials in a build.gradle file 
+
+### Credentials in a build.gradle file
 
 Find your Application's `build.gradle` file. Next, add the `auth0` closure with `domain` and `lock.clientId` key/values.
 
