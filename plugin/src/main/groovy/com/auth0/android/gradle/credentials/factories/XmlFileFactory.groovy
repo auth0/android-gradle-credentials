@@ -41,6 +41,6 @@ public class XmlFileFactory implements FileFactory {
     @NonNull
     @Override
     File create(@NonNull String fileName) {
-        new File("${buildDir}/intermediates/res/merged/${variantDir}/values/${fileName}.xml")
+        new File("${buildDir}/generated/res/resValues/${variantDir}/values/${fileName}.xml")
     }
 }
