@@ -43,7 +43,7 @@ public class GuardianExtension implements ExtensionValidator {
     @NonNull
     Map getValues() {
         Map values = new HashMap<>();
-        values.put(RES_GUARDIAN_DOMAIN_KEY, domain);
+        values.put(RES_GUARDIAN_DOMAIN_KEY, domain)
         return values
     }
 }

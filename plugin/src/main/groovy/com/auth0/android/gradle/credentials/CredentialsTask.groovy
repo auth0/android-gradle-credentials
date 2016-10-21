@@ -54,7 +54,7 @@ class CredentialsTask extends DefaultTask {
     @SuppressWarnings("GroovyUnusedDeclaration")
     @TaskAction
     void run() {
-        brewXml();
+        brewXml()
     }
 
     @NonNull

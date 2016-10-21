@@ -25,10 +25,13 @@
 package com.auth0.android.gradle.credentials.sanitizers
 
 import org.gradle.api.InvalidUserDataException
-import org.gradle.internal.impldep.org.junit.Test
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.junit.runners.JUnit4
 
 import static org.assertj.core.api.Assertions.assertThat
 
+@RunWith(JUnit4.class)
 class XmlFileNameSanitizerTest extends GroovyTestCase {
 
     private final FileNameSanitizer sanitizer = new XmlFileNameSanitizer()

@@ -24,8 +24,13 @@
 
 package com.auth0.android.gradle.credentials.factories
 
-import org.gradle.internal.impldep.org.testng.annotations.Test
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.junit.runners.JUnit4
 
+import static org.assertj.core.api.Assertions.assertThat
+
+@RunWith(JUnit4.class)
 class XmlFileFactoryTest extends GroovyTestCase {
 
     @Test
@@ -36,7 +41,7 @@ class XmlFileFactoryTest extends GroovyTestCase {
         FileFactory fileFactory = new XmlFileFactory(buildDir, variantDir)
 
         File actual = fileFactory.create fileName
-        File expected = new File("${buildDir}/intermediates/res/merged/${variantDir}/values/${fileName}.xml")
+        File expected = new File("${buildDir}/generated/res/resValues/${variantDir}/values/${fileName}.xml")
 
         assertThat actual.path isEqualTo expected.path
     }

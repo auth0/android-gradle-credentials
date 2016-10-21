@@ -30,5 +30,5 @@ import com.android.annotations.Nullable
 public interface FileNameSanitizer {
 
     @NonNull
-    String sanitize(@Nullable String fileName);
+    String sanitize(@Nullable String fileName)
 }
