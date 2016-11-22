@@ -16,7 +16,7 @@ dependencies {
 //noinspection GroovyUnusedAssignment
 archivesBaseName = 'gradle-credentials'
 group = 'com.auth0.android'
-version = '1.0.0'
+version = '1.0.1'
 
 pluginBundle {
   website = 'https://github.com/auth0/android-gradle-credentials'
