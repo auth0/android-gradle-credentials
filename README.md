@@ -7,7 +7,7 @@ This plugin generates an XML file with the required Auth0 credentials. It create
 ## Setup
 
 ### Using Gradle
-This is the **RECOMMENDED** approach. Add the Gradle's Maven url to the buildscript/repositories list and also add the plugin to the buildscript/classpath inside the project's `build.gradle` file:g
+This is the **RECOMMENDED** approach. Add the Gradle's Maven url to the buildscript/repositories list and also add the plugin to the buildscript/classpath inside the project's `build.gradle` file:
 
 ```groovy
 buildscript {
@@ -17,14 +17,14 @@ buildscript {
         maven { url "https://plugins.gradle.org/m2/" }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.1'
+        classpath 'com.android.tools.build:gradle:2.2.2'
         //...
-        classpath 'gradle.plugin.com.auth0.android:gradle-credentials:1.0.0'
+        classpath 'gradle.plugin.com.auth0.android:gradle-credentials:1.0.1'
     }
 }
 ```
 
-Go to your application's `build.gradle` file and apply the **gradle-credentials** plugin after the **android.application** plugin.
+Then go to your application's `build.gradle` file and apply the **gradle-credentials** plugin after the **android.application** plugin.
 
 ```groovy
 apply plugin: 'com.android.application'
@@ -53,7 +53,7 @@ buildscript {
 }
 ```
 
-Go to your application's `build.gradle` file and apply the **gradle-credentials** plugin after the **android.application** plugin.
+Then go to your application's `build.gradle` file and apply the **gradle-credentials** plugin after the **android.application** plugin.
 
 ```groovy
 apply plugin: 'com.android.application'
@@ -83,7 +83,7 @@ buildscript {
 }
 ```
 
-Go to your application's `build.gradle` file and apply the **gradle-credentials** plugin after the **android.application** plugin.
+Then go to your application's `build.gradle` file and apply the **gradle-credentials** plugin after the **android.application** plugin.
 
 ```groovy
 apply plugin: 'com.android.application'
